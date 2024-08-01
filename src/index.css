@@ -1,0 +1,13 @@
+.tableContainer {
+  padding: 25px;
+  background: #191937;
+  border-radius: 6px;
+}
+
+body {
+  margin: 199px;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /*border: 2px solid red;*/
+}
