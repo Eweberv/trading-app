@@ -2,6 +2,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
+import currenciesData from "../currenciesData.json"
 
 interface CurrencySelectProps {
     value: string;
@@ -20,8 +21,7 @@ const CurrencySelect: React.FC<CurrencySelectProps> = ({ value, label, onChange 
                 label={label}
                 onChange={onChange}
             >
-                <MenuItem value={"$"}>$</MenuItem>
-                <MenuItem value={"€"}>€</MenuItem>
+                {currenciesData.map((e) => <MenuItem value={e.iso}>{e.symbol} - {e.description}</MenuItem>)}
             </Select>
         </FormControl>
     );

@@ -1,19 +1,20 @@
-import {Button, TextField, Typography} from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import CurrencySelect from "./CurrencySelect.tsx";
 import { useNavigate } from "react-router-dom";
+import currencies from "../currenciesData.json"; // Import du fichier JSON
 
 const SharesNumberCalculator = () => {
     const navigate = useNavigate();
 
     const [capitalToInvest, setCapitalToInvest] = useState("1000");
-    const [capitalCurrency, setCapitalCurrency] = useState("$");
+    const [capitalCurrency, setCapitalCurrency] = useState("USD");
     const [sharePrice, setSharePrice] = useState("22.4");
-    const [sharePriceCurrency, setSharePriceCurrency] = useState("$");
+    const [shareCurrency, setshareCurrency] = useState("USD");
     const [perOrderCommission, setPerOrderCommission] = useState("1");
-    const [perOrderCommissionCurrency, setPerOrderCommissionCurrency] = useState("$");
+    const [perOrderCommissionCurrency, setPerOrderCommissionCurrency] = useState("USD");
     const [roundPrecision, setRoundPrecision] = useState("3");
     const [result, setResult] = useState(null);
 
@@ -22,20 +23,21 @@ const SharesNumberCalculator = () => {
         console.log('Share price: ', sharePrice);
         navigate('/gainLossCalculator', {
             state: {
+                currency: shareCurrency,
                 sharesNb: result.sharesNb,
                 sharePrice: sharePrice
             }
         });
     }
 
-    const calculateGainLossPotential = async() => {
+    const calculateSharesNumber = async () => {
         try {
             console.log(`Debug:\nCapital to invest: ${capitalToInvest}\nShare Price: ${sharePrice}\n`);
             const data = {
                 capitalToInvest,
                 capitalCurrency,
                 sharePrice,
-                sharePriceCurrency,
+                shareCurrency,
                 perOrderCommission,
                 perOrderCommissionCurrency,
                 roundPrecision
@@ -47,9 +49,14 @@ const SharesNumberCalculator = () => {
                 headers: headers
             });
             setResult(response.data);
-        } catch(e) {
+        } catch (e) {
             console.error("Error sending data to backend: ", e);
         }
+    }
+
+    const getCurrencySymbol = (isoCode) => {
+        const currency = currencies.find(currency => currency.iso === isoCode);
+        return currency ? currency.symbol : isoCode;
     }
 
     useEffect(() => {
@@ -87,8 +94,8 @@ const SharesNumberCalculator = () => {
                         />
                         <CurrencySelect
                             label="Currency"
-                            value={sharePriceCurrency}
-                            onChange={(e) => setSharePriceCurrency(e.target.value as string)}
+                            value={shareCurrency}
+                            onChange={(e) => setshareCurrency(e.target.value as string)}
                         />
                     </Box>
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"center"} alignItems={"center"} gap={"10px"}>
@@ -113,20 +120,19 @@ const SharesNumberCalculator = () => {
                         sx={{maxWidth: "270px"}}
                     />
                     <Box display={"flex"} flexDirection={"row"} justifyContent={"center"}>
-                        <Button sx={{margin: "30px", maxWidth: "120px"}} variant="contained" onClick={calculateGainLossPotential}>Calculate</Button>
+                        <Button sx={{margin: "30px", maxWidth: "120px"}} variant="contained" onClick={calculateSharesNumber}>Calculate</Button>
                     </Box>
                     {result && (
-                        <Box display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
-                            <Typography variant="h6">
-                                You can buy {result.sharesNb} shares with {result.capitalToInvest}{result.capitalCurrency} capital
-                            </Typography>
-                            <Button sx={{margin: "30px"}} variant="contained" onClick={pasteToGainLossCalculator}>Paste to gain loss calculator</Button>
+                        <Box display={"flex"} flexDirection={"column"} justifyContent={"center"}
+                             alignItems={"center"} gap={"10px"}>
+                            <Typography variant="h6">You can buy {result.sharesNb} shares with {result.capitalToInvest}{getCurrencySymbol(result.capitalCurrency)} capital</Typography>
+                            <Button variant="contained" onClick={pasteToGainLossCalculator}>Paste to Gain Loss Calculator</Button>
                         </Box>
                     )}
                 </Box>
             </Box>
         </div>
-    )
+    );
 }
 
 export default SharesNumberCalculator;
